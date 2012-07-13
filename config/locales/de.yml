@@ -1,0 +1,8 @@
+de:
+  permission_edit_assigned_to:     "Tickets zuweisen"
+  permission_edit_due_date:        "Abgabedatum bearbeiten"
+  permission_edit_estimated_hours: "Geschätzten Aufwand bearbeiten"
+
+  label_history_tab_all: Alles
+  label_history_tab_comments: Kommentare
+

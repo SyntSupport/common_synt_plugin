@@ -1,0 +1,29 @@
+Fields permissions plugin allow you to enable or disable the view of 3 fields in the workflow, fields can be disabled :
+
+- Assigned to
+- Due date
+- Estimated hours
+
+With this plugins you can now disable these fields for some users or groups, it's useful because customer don't have the necessity to set these information and it's needed by managers and developers.
+
+= Mandatory fields and status autochange
+
+= Author
+Turkin Ilya (iturkin@syntellect.ru). Based on work of Aaron Addleman © 2011 9thport. 9thport.net: Due date with offset for redmine= redmine_issue_history_tabs
+
+A plugin to represent history in tabs.
+
+Modified to work with ChiliProject= Refined watchers list
+
+Refine watchers list
+
+= Author
+Turkin Ilya (iturkin@syntellect.ru).
+
+= Strong password check
+
+Add check for strong passwords
+
+= Author
+Turkin Ilya (iturkin@syntellect.ru).
+

@@ -1,0 +1,11 @@
+# English strings go here for Rails i18n
+en:
+    duedateoffset_menuitem: Due Date Settings
+
+    permission_edit_assigned_to:     "Assigned to"
+    permission_edit_due_date:        "Edit due date"
+    permission_edit_estimated_hours: "Edit estimated time"
+
+    label_history_tab_all: All
+    label_history_tab_comments: Comments
+
