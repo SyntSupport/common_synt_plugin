@@ -2,19 +2,64 @@ module StrongPasswordCheck
   module Patches
     module UserPatch
       def self.included(base)
+        base.extend(ClassMethods)
         base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
-          
+
           # run code for updating issue
           alias_method_chain :before_save, :pass_check
         end
       end
 
       module ClassMethods
+        def create_users_by_mails(mails,project_id)
+          #добавлять пользователя и назначать его клиентом проекта
+          mails = mails.split(/[,;\s]/).compact
+          ids = []
+          mail_errors = []
+          mails.each do |mail|
+            logger.info mail
+            if mail =~ /syntellect.ru$/i
+              mail_errors << mail + " " + :not_valid_mail
+              next
+            end
+            if fuser = User.find_by_mail(mail)
+              logger.info 'user.not_new'
+              ids << fuser.id.to_s
+            else
+              logger.info 'user.new'
+              user_params = {:login => mail, :firstname=> mail, :lastname=>"not_user", :mail=> mail, :language=>"ru", :admin=>"0", :mail_notification=>"only_my_events"}
+              pref = {:hide_mail=>"0", :time_zone=>"", :comments_sorting=>"asc", :warn_on_leaving_unsaved=>"1"}
+              user = User.new(:language => Setting.default_language, :mail_notification => Setting.default_notification_option)
+              user.safe_attributes = user_params
+              user.admin = user_params[:admin] || false
+              user.login = user_params[:login]
+              #user.password, user.password_confirmation = user_params[:password], user_params[:password_confirmation]
+
+              user.pref.attributes = pref
+              user.pref[:no_self_notified] = true
+
+              if user.save
+                logger.info 'user.save'
+                user.pref.save
+                membership = Member.edit_membership(nil, ({"role_ids"=>["6"]}).merge(:project_id => project_id), user)
+                membership.save
+                ids << user.id.to_s
+              else
+                logger.info 'user.errors'
+                user.errors.full_messages.each do |message|
+                  mail_errors << (message + ": " + mail)
+                end
+              end
+            end
+          end
+          logger.info ids.inspect
+          return mail_errors, ids
+        end
       end
 
-      module InstanceMethods   
+      module InstanceMethods
         def before_save_with_pass_check
             if self.password_confirmation
               if self.password.match(/^#{self.login}/)
@@ -140,3 +185,4 @@ module StrongPasswordCheck
     end
   end
 end
+

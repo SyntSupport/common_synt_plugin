@@ -13,7 +13,7 @@ module RefinedWatchersList
       end
 
       module ClassMethods
-        
+
       end
 
       module InstanceMethods
@@ -30,6 +30,7 @@ module RefinedWatchersList
                   lis_filt << "</ul>"
                 end
               else
+                watcher.slice!(" not_user")
                 lis_filt << watcher << "\n"
               end
             end
@@ -40,3 +41,4 @@ module RefinedWatchersList
     end
   end
 end
+

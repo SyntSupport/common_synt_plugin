@@ -6,16 +6,59 @@ module MandatoryFieldsAndStatusAutochange
         base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
-
-          # run code for updating issue
+ # run code for updating issue
           alias_method_chain :update, :write_due_date
+
+           # for the watchers adding by mail
+          alias_method_chain :create, :watchers_adding
         end
+
       end
 
       module ClassMethods
       end
 
       module InstanceMethods
+        def create_with_watchers_adding
+          if params.key? 'watcher_mails'
+            mail_errors, ids = User.create_users_by_mails(params[:watcher_mails],@project.id)
+            mail_errors.each do |message|
+              @issue.errors.add_to_base(message)
+            end
+            if @issue.errors.full_messages.empty? and not ids.empty?
+              ids.each do |id|
+                @issue.add_watcher(User.find(id))
+              end
+            end
+
+            call_hook(:controller_issues_new_before_save, { :params => params, :issue => @issue })
+            IssueObserver.instance.send_notification = params[:send_notification] == true
+
+            if @issue.errors.empty? && @issue.save
+              attachments = Attachment.attach_files(@issue, params[:attachments])
+              render_attachment_warning_if_needed(@issue)
+              flash[:notice] = l(:notice_successful_create)
+              call_hook(:controller_issues_new_after_save, { :params => params, :issue => @issue})
+              logger.info @issue.watchers.inspect
+              respond_to do |format|
+                format.html {
+                  redirect_to(params[:continue] ?  { :action => 'new', :project_id => @project, :issue => {:tracker_id => @issue.tracker, :parent_issue_id => @issue.parent_issue_id}.reject {|k,v| v.nil?} } :
+                              { :action => 'show', :id => @issue })
+                }
+                format.api  { render :action => 'show', :status => :created, :location => issue_url(@issue) }
+              end
+              return
+            else
+              respond_to do |format|
+                format.html { render :action => 'new' }
+                format.api  { render_validation_errors(@issue) }
+              end
+            end
+          else
+            create_without_watchers_adding
+          end
+        end
+
         # when updating an issues due_date
         def update_with_write_due_date
           if (params[:issue].key?(:status_id))

@@ -27,3 +27,9 @@ ru:
   no_spec: "нет специальных символов"
   start_with_name: "начинается с логина"
 
+  watcher_mail: "E-mail наблюдателя"
+
+  watcher_mails: "Дополнительные e-mail для нотификаций:"
+  field_watcher_mail:   "E-mail наблюдателя"
+  not_valid_mail: "не разрешенный e-mail"
+

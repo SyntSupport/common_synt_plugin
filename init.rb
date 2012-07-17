@@ -2,10 +2,11 @@ require 'redmine'
 require 'date'
 require 'active_support'
 
+require File.dirname(__FILE__) + '/lib/user_patch.rb'
 require File.dirname(__FILE__) + '/lib/issues_controller_patch.rb'
 require File.dirname(__FILE__) + '/lib/project_patch.rb'
 require File.dirname(__FILE__) + '/lib/watchers_helper_patch.rb'
-require File.dirname(__FILE__) + '/lib/user_patch.rb'
+require File.dirname(__FILE__) + '/lib/watchers_controller_patch.rb'
 
 require 'dispatcher'
 Dispatcher.to_prepare :common_synt_plugin do
@@ -20,6 +21,12 @@ Dispatcher.to_prepare :common_synt_plugin do
   #require_dependency 'project'
   require_dependency 'user'
   User.send(:include, StrongPasswordCheck::Patches::UserPatch)
+
+  require_dependency 'issues_controller'
+  IssuesController.send(:include, MandatoryFieldsAndStatusAutochange::Patches::IssuesControllerPatch)
+
+  require_dependency 'watchers_controller'
+  WatchersController.send(:include, RefinedWatchersList::Patches::WatchersControllerPatch)
 end
 
 Redmine::Plugin.register :common_synt_plugin do
