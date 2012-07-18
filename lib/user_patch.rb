@@ -20,10 +20,12 @@ module StrongPasswordCheck
           mail_errors = []
           mails.each do |mail|
             if mail =~ /syntellect.ru$/i
+              logger.info 'user.errors'
               mail_errors << (l(:not_valid_mail) + ": " + mail)
               next
             end
             if mail.length > 30
+              logger.info 'user.errors'
               mail_errors << (l(:mail_too_long) + ": " + mail)
               next
             end
