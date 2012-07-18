@@ -15,13 +15,16 @@ module StrongPasswordCheck
       module ClassMethods
         def create_users_by_mails(mails,project_id)
           #добавлять пользователя и назначать его клиентом проекта
-          mails = mails.split(/[,;\s]/).compact
+          mails = mails.split(/[,;\s]/).uniq.delete_if(&:empty?)
           ids = []
           mail_errors = []
           mails.each do |mail|
-            logger.info mail
             if mail =~ /syntellect.ru$/i
-              mail_errors << mail + " " + :not_valid_mail
+              mail_errors << (l(:not_valid_mail) + ": " + mail)
+              next
+            end
+            if mail.length > 30
+              mail_errors << (l(:mail_too_long) + ": " + mail)
               next
             end
             if fuser = User.find_by_mail(mail)
@@ -40,21 +43,25 @@ module StrongPasswordCheck
               user.pref.attributes = pref
               user.pref[:no_self_notified] = true
 
-              if user.save
-                logger.info 'user.save'
-                user.pref.save
-                membership = Member.edit_membership(nil, ({"role_ids"=>["6"]}).merge(:project_id => project_id), user)
-                membership.save
-                ids << user.id.to_s
-              else
-                logger.info 'user.errors'
-                user.errors.full_messages.each do |message|
-                  mail_errors << (message + ": " + mail)
+              begin
+                if user.save
+                  logger.info 'user.save'
+                  user.pref.save
+                  membership = Member.edit_membership(nil, ({"role_ids"=>["6"]}).merge(:project_id => project_id), user)
+                  membership.save
+                  ids << user.id.to_s
+                else
+                  logger.info 'user.errors'
+                  user.errors.full_messages.each do |message|
+                    mail_errors << (message + ": " + mail)
+                  end
                 end
+              rescue Exception => exp
+                logger.info exp.inspect
+                mail_errors << (l(:not_valid_mail) + ": " + mail)
               end
             end
           end
-          logger.info ids.inspect
           return mail_errors, ids
         end
       end

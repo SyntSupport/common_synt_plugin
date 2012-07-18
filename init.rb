@@ -10,9 +10,6 @@ require File.dirname(__FILE__) + '/lib/watchers_controller_patch.rb'
 
 require 'dispatcher'
 Dispatcher.to_prepare :common_synt_plugin do
-  require_dependency 'issues_controller'
-  IssuesController.send(:include, MandatoryFieldsAndStatusAutochange::Patches::IssuesControllerPatch)
-
   require_dependency 'project'
   Project.send(:include, RefinedWatchersList::Patches::ProjectPatch)
   require_dependency 'watchers_helper'

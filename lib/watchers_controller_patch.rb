@@ -19,9 +19,6 @@ module RefinedWatchersList
       module InstanceMethods
         def new_with_watchers_adding
           if params['watcher_mails'] != ""
-            logger.info @watched.inspect
-            logger.info @watched.project.inspect
-            logger.info @watched.project.id
             mail_errors, ids = User.create_users_by_mails(params[:watcher_mails],@watched.project.id)
             if mail_errors.empty? and not ids.empty?
               if not params.key? :user_ids

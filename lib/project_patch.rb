@@ -5,7 +5,7 @@ module RefinedWatchersList
         base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
-          
+
           # run code for updating issue
           alias_method_chain :users, :refined_list
         end
@@ -14,9 +14,9 @@ module RefinedWatchersList
       module ClassMethods
       end
 
-      module InstanceMethods           
+      module InstanceMethods
         def users_with_refined_list
-          users = users_without_refined_list
+          users = users_without_refined_list.delete_if{|item| item.lastname =~ /not_user/}
           if (!User.current.allowed_to?(:see_real_names, self, :global => true))
             current_role = User.current.roles_for_project(self)
             filtered_users = []
@@ -32,8 +32,9 @@ module RefinedWatchersList
             return filtered_users
           end
           return users
-        end       
+        end
       end
     end
   end
 end
+

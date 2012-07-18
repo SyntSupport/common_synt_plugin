@@ -29,7 +29,8 @@ ru:
 
   watcher_mail: "E-mail наблюдателя"
 
-  watcher_mails: "Дополнительные e-mail для нотификаций:"
+  watcher_mails: "Дополнительные e-mail для нотификаций"
   field_watcher_mail:   "E-mail наблюдателя"
   not_valid_mail: "не разрешенный e-mail"
+  mail_too_long: "Максимальная длина email - 30 символов"
 

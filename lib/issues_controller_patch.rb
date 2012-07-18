@@ -8,7 +8,6 @@ module MandatoryFieldsAndStatusAutochange
           unloadable
  # run code for updating issue
           alias_method_chain :update, :write_due_date
-
            # for the watchers adding by mail
           alias_method_chain :create, :watchers_adding
         end
@@ -39,7 +38,6 @@ module MandatoryFieldsAndStatusAutochange
               render_attachment_warning_if_needed(@issue)
               flash[:notice] = l(:notice_successful_create)
               call_hook(:controller_issues_new_after_save, { :params => params, :issue => @issue})
-              logger.info @issue.watchers.inspect
               respond_to do |format|
                 format.html {
                   redirect_to(params[:continue] ?  { :action => 'new', :project_id => @project, :issue => {:tracker_id => @issue.tracker, :parent_issue_id => @issue.parent_issue_id}.reject {|k,v| v.nil?} } :
