@@ -15,6 +15,8 @@ module StrongPasswordCheck
       module ClassMethods
         def create_users_by_mails(mails,project_id)
           #добавлять пользователя и назначать его клиентом проекта
+          mail_patterns = CustomValue.find(:first, :conditions => "customized_id = #{project_id} and custom_field_id = '11'")
+          mail_patterns = mail_patterns.value.split(/[,;\s]/).uniq.delete_if(&:empty?).map{|item| '@' + item} if not mail_patterns.nil?
           mails = mails.split(/[,;\s]/).uniq.delete_if(&:empty?)
           ids = []
           mail_errors = []
@@ -22,6 +24,16 @@ module StrongPasswordCheck
             if mail =~ /syntellect.ru$/i
               logger.info 'user.errors'
               mail_errors << (l(:not_valid_mail) + ": " + mail)
+              next
+            end
+            ispatterned = false
+            mail_patterns.each do |patt|
+              if mail.match(patt)
+                ispatterned = true
+              end
+            end
+            if not mail_patterns.nil? and ispatterned == false
+              mail_errors << (l(:wrong_domain) + ": " + mail)
               next
             end
             if mail.length > 30

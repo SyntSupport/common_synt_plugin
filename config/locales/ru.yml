@@ -33,4 +33,5 @@ ru:
   field_watcher_mail:   "E-mail наблюдателя"
   not_valid_mail: "не разрешенный e-mail"
   mail_too_long: "Максимальная длина email - 30 символов"
+  wrong_domain: "Неверный домен"
 
