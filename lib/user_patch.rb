@@ -22,7 +22,7 @@ module StrongPasswordCheck
             #добавлять пользователя и назначать его клиентом проекта
             #custom_field_id = '11' - это настаиваемое значение для проекта !!!!НАДО ПОМЕНЯТЬ, ЕСЛИ ДРУГОЙ ИД!!!!
             mail_patterns = CustomValue.find(:first, :conditions => "customized_id = #{project_id} and custom_field_id = '11'")
-            mail_patterns = mail_patterns.value.split(/[,;\s]/).uniq.delete_if(&:empty?) if not mail_patterns.nil?
+            mail_patterns = (mail_patterns.value.split(/[,;\s]/).uniq.delete_if(&:empty?) if not mail_patterns.nil?) || []
             mails = mails.split(/[,;\s]/).uniq.delete_if(&:empty?)
             ids = []
             mail_errors = []
@@ -39,7 +39,7 @@ module StrongPasswordCheck
                   ispatterned = true
                 end
               end
-              if not mail_patterns.nil? and ispatterned == false
+              if not mail_patterns.blank? and ispatterned == false
                 mail_errors << (l(:wrong_domain) + ": " + mail)
                 next
               end
