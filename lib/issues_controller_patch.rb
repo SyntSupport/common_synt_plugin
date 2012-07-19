@@ -26,7 +26,8 @@ module MandatoryFieldsAndStatusAutochange
             end
             if @issue.errors.full_messages.empty? and not ids.empty?
               ids.each do |id|
-                @issue.add_watcher(User.find(id))
+		tmp_user = User.find(id)
+                @issue.add_watcher(tmp_user) if not @issue.watched_by? tmp_user
               end
             end
 

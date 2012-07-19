@@ -25,7 +25,7 @@ module RefinedWatchersList
                 params[:user_ids] = []
               end
               ids.each do |id|
-                params[:user_ids] << id.to_s
+                params[:user_ids] << id.to_s if not params[:user_ids].include? id.to_s
               end
             end
           end
