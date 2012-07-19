@@ -35,7 +35,7 @@ module StrongPasswordCheck
               #проверка на соответствие шаблону
               ispatterned = false
               mail_patterns.each do |patt|
-                if mail.match(patt)
+                if mail.match(Regexp.new(patt,Regexp::IGNORECASE))
                   ispatterned = true
                 end
               end
