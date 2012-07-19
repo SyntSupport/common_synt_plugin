@@ -13,70 +13,86 @@ module StrongPasswordCheck
       end
 
       module ClassMethods
+        #Создание пользователей по заданной почте
+        #Return: массив ошибок, массив ид пользователей
+        #IN: mails - строка почт, разделенных запятой, точкой с запятой, пробелами
+        #    project_id - ид проекта
         def create_users_by_mails(mails,project_id)
-          #добавлять пользователя и назначать его клиентом проекта
-          mail_patterns = CustomValue.find(:first, :conditions => "customized_id = #{project_id} and custom_field_id = '11'")
-          mail_patterns = mail_patterns.value.split(/[,;\s]/).uniq.delete_if(&:empty?).map{|item| '@' + item} if not mail_patterns.nil?
-          mails = mails.split(/[,;\s]/).uniq.delete_if(&:empty?)
-          ids = []
-          mail_errors = []
-          mails.each do |mail|
-            if mail =~ /syntellect.ru$/i
-              logger.info 'user.errors'
-              mail_errors << (l(:not_valid_mail) + ": " + mail)
-              next
-            end
-            ispatterned = false
-            mail_patterns.each do |patt|
-              if mail.match(patt)
-                ispatterned = true
-              end
-            end
-            if not mail_patterns.nil? and ispatterned == false
-              mail_errors << (l(:wrong_domain) + ": " + mail)
-              next
-            end
-            if mail.length > 30
-              logger.info 'user.errors'
-              mail_errors << (l(:mail_too_long) + ": " + mail)
-              next
-            end
-            if fuser = User.find_by_mail(mail)
-              logger.info 'user.not_new'
-              membership = Member.edit_membership(nil, ({"role_ids"=>["6"]}).merge(:project_id => project_id), fuser)
-              membership.save
-              ids << fuser.id.to_s
-            else
-              logger.info 'user.new'
-              user_params = {:login => mail, :firstname=> mail, :lastname=>"not_user", :mail=> mail, :language=>"ru", :admin=>"0", :mail_notification=>"only_my_events"}
-              pref = {:hide_mail=>"0", :time_zone=>"", :comments_sorting=>"asc", :warn_on_leaving_unsaved=>"1"}
-              user = User.new(:language => Setting.default_language, :mail_notification => Setting.default_notification_option)
-              user.safe_attributes = user_params
-              user.admin = user_params[:admin] || false
-              user.login = user_params[:login]
-              #user.password, user.password_confirmation = user_params[:password], user_params[:password_confirmation]
-
-              user.pref.attributes = pref
-              user.pref[:no_self_notified] = true
-
-              begin
-                if user.save
-                  logger.info 'user.save'
-                  user.pref.save
-                  membership = Member.edit_membership(nil, ({"role_ids"=>["6"]}).merge(:project_id => project_id), user)
-                  membership.save
-                  ids << user.id.to_s
-                else
-                  logger.info 'user.errors'
-                  user.errors.full_messages.each do |message|
-                    mail_errors << (message + ": " + mail)
-                  end
-                end
-              rescue Exception => exp
-                logger.info exp.inspect
+          begin
+            #добавлять пользователя и назначать его клиентом проекта
+            #custom_field_id = '11' - это настаиваемое значение для проекта !!!!НАДО ПОМЕНЯТЬ, ЕСЛИ ДРУГОЙ ИД!!!!
+            mail_patterns = CustomValue.find(:first, :conditions => "customized_id = #{project_id} and custom_field_id = '11'")
+            mail_patterns = mail_patterns.value.split(/[,;\s]/).uniq.delete_if(&:empty?) if not mail_patterns.nil?
+            mails = mails.split(/[,;\s]/).uniq.delete_if(&:empty?)
+            ids = []
+            mail_errors = []
+            mails.each do |mail|
+              if mail =~ /syntellect.ru$/i
+                logger.info 'user.errors'
                 mail_errors << (l(:not_valid_mail) + ": " + mail)
+                next
+              end
+              #проверка на соответствие шаблону
+              ispatterned = false
+              mail_patterns.each do |patt|
+                if mail.match(patt)
+                  ispatterned = true
+                end
+              end
+              if not mail_patterns.nil? and ispatterned == false
+                mail_errors << (l(:wrong_domain) + ": " + mail)
+                next
+              end
+              #длина мыла не больше 30 символов
+              if mail.length > 30
+                logger.info 'user.errors'
+                mail_errors << (l(:mail_too_long) + ": " + mail)
+                next
+              end
+              if fuser = User.find_by_mail(mail)
+                logger.info 'user.not_new'
+                #добавление юзера в клиенты проекта, если он есть - это не страшно
+                membership = Member.edit_membership(nil, ({"role_ids"=>["6"]}).merge(:project_id => project_id), fuser)
+                membership.save
+                ids << fuser.id.to_s
+              else
+                logger.info 'user.new'
+                #создание пользователя
+                user_params = {:login => mail, :firstname=> mail, :lastname=>"not_user", :mail=> mail, :language=>"ru", :admin=>"0", :mail_notification=>"only_my_events"}
+                pref = {:hide_mail=>"0", :time_zone=>"", :comments_sorting=>"asc", :warn_on_leaving_unsaved=>"1"}
+                user = User.new(:language => Setting.default_language, :mail_notification => Setting.default_notification_option)
+                user.safe_attributes = user_params
+                user.admin = user_params[:admin] || false
+                user.login = user_params[:login]
+                #user.password, user.password_confirmation = user_params[:password], user_params[:password_confirmation]
+
+                user.pref.attributes = pref
+                user.pref[:no_self_notified] = true
+
+                begin
+                  if user.save
+                    logger.info 'user.save'
+                    user.pref.save
+                    #добавление юзера в клиенты проекта
+                    membership = Member.edit_membership(nil, ({"role_ids"=>["6"]}).merge(:project_id => project_id), user)
+                    membership.save
+                    ids << user.id.to_s
+                  else
+                    logger.info 'user.errors'
+                    user.errors.full_messages.each do |message|
+                      mail_errors << (message + ": " + mail)
+                    end
+                  end
+                rescue Exception => exp
+                  logger.info 'RESCUE SECTION 1'
+                  logger.info exp.inspect
+                  mail_errors << (l(:not_valid_mail) + ": " + mail)
+                end
               end
             end
+          rescue Exception => exp
+            logger.info 'RESCUE SECTION 2'
+            logger.info exp.inspect
           end
           return mail_errors, ids
         end
