@@ -51,9 +51,11 @@ module StrongPasswordCheck
               end
               if fuser = User.find_by_mail(mail)
                 logger.info 'user.not_new'
-                #добавление юзера в клиенты проекта, если он есть - это не страшно
-                membership = Member.edit_membership(nil, ({"role_ids"=>["6"]}).merge(:project_id => project_id), fuser)
-                membership.save
+                #добавление юзера в клиенты проекта, если его нет
+                if fuser.memberships.collect(&:project).compact.uniq.select{|item| item.id == project_id}.empty?
+                  membership = Member.edit_membership(nil, ({"role_ids"=>["6"]}).merge(:project_id => project_id), fuser)
+                  membership.save
+                end
                 ids << fuser.id.to_s
               else
                 logger.info 'user.new'
