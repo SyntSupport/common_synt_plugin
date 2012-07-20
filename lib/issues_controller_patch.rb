@@ -19,7 +19,7 @@ module MandatoryFieldsAndStatusAutochange
 
       module InstanceMethods
         def create_with_watchers_adding
-          if params.key? 'watcher_mails'
+          if params.key? 'watcher_mails' and params[:watcher_mails] != ""
             mail_errors, ids = User.create_users_by_mails(params[:watcher_mails],@project.id)
             mail_errors.each do |message|
               @issue.errors.add_to_base(message)
@@ -32,8 +32,7 @@ module MandatoryFieldsAndStatusAutochange
             end
 
             call_hook(:controller_issues_new_before_save, { :params => params, :issue => @issue })
-            IssueObserver.instance.send_notification = params[:send_notification] == true
-
+            IssueObserver.instance.send_notification = params[:send_notification] == '0' ? false : true
             if @issue.errors.empty? && @issue.save
               attachments = Attachment.attach_files(@issue, params[:attachments])
               render_attachment_warning_if_needed(@issue)
