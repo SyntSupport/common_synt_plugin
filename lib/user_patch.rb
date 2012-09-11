@@ -43,8 +43,8 @@ module StrongPasswordCheck
                 mail_errors << (l(:wrong_domain) + ": " + mail)
                 next
               end
-              #длина мыла не больше 30 символов
-              if mail.length > 30
+              #длина мыла не больше 50 символов
+              if mail.length > 50
                 logger.info 'user.errors'
                 mail_errors << (l(:mail_too_long) + ": " + mail)
                 next

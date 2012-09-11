@@ -35,7 +35,7 @@
 <label class="floating"><%= check_box_tag 'issue[watcher_user_ids][]', user.id, @issue.watched_by?(user) || (user.client? if user.respond_to?('client?')) %> <%=h user %></label>
 <% end -%>
 </p>
-<p><%= label_tag :watcher_mails, l(:watcher_mails) %><%= text_field_tag :watcher_mails, nil, :size => 80,  :maxlength=>100 %></p>
+<p><%= label_tag :watcher_mails, l(:watcher_mails) %><%= text_field_tag :watcher_mails, nil, :size => 80,  :maxlength=> 210 %></p>
 <% end %>
 
 <%= call_hook(:view_issues_form_details_bottom, { :issue => @issue, :form => f }) %>
