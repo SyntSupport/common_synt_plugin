@@ -41,7 +41,9 @@
   <%= render :partial => 'issues/attributes' %>
 </div>
 <%# synt: add a watchers emails %>
+<% if @issue.new_record? %>
 <p><%= label_tag :watcher_mails, l(:watcher_mails) %><%= text_field_tag :watcher_mails, nil, :size => 80,  :maxlength=> 210 %></p>
+<% end %>
 
 <%= call_hook(:view_issues_form_details_bottom, { :issue => @issue, :form => f }) %>
 <% end %>
