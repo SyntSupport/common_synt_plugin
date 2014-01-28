@@ -6,6 +6,7 @@ module UsersControllerPatch
   module InstanceMethods
     def self.included(receiver)
       receiver.class_eval do
+        # not to allow a customer to browse a worker profile page
         def show
           # show projects based on current user visibility
           @memberships = @user.memberships.where(Project.visible_condition(User.current)).all

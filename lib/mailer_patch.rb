@@ -6,6 +6,7 @@ module MailerPatch
   module InstanceMethods
     def self.included(receiver)
       receiver.class_eval do
+        # not to show real workers names on a notification mail
         def self.deliver_issue_edit(journal)
           issue = journal.journalized.reload
           to = journal.notified_users
@@ -25,6 +26,7 @@ module MailerPatch
           end
         end
 
+        # not to show real workers names on a notification mail
         def self.deliver_issue_add(issue)
           to = issue.notified_users
           cc = issue.notified_watchers - to

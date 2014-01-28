@@ -17,6 +17,7 @@ module WatchersControllerPatch
   module InstanceMethods
     def self.included(receiver)
       receiver.class_eval do
+        # not to show workers in autocomplete for a customer
         def autocomplete_for_user
           query = "#{params[:q]}".downcase
           @users = @project.members
@@ -33,20 +34,20 @@ module WatchersControllerPatch
       end
     end
 
-    def new_with_watchers_adding
-      if params['watcher_mails'] != ""
-        mail_errors, ids = User.create_users_by_mails(params[:watcher_mails],@watched.project.id)
-        if mail_errors.empty? and not ids.empty?
-          if not params.key? :user_ids
-            params[:user_ids] = []
-          end
-          ids.each do |id|
-            params[:user_ids] << id.to_s if not params[:user_ids].include? id.to_s
-          end
-        end
-      end
-      new_without_watchers_adding
-    end
+    # def new_with_watchers_adding
+    #   if params['watcher_mails'] != ""
+    #     mail_errors, ids = User.create_users_by_mails(params[:watcher_mails],@watched.project.id)
+    #     if mail_errors.empty? and not ids.empty?
+    #       if not params.key? :user_ids
+    #         params[:user_ids] = []
+    #       end
+    #       ids.each do |id|
+    #         params[:user_ids] << id.to_s if not params[:user_ids].include? id.to_s
+    #       end
+    #     end
+    #   end
+    #   new_without_watchers_adding
+    # end
   end
 end
 

@@ -4,7 +4,7 @@ module IssuesControllerPatch
     base.send(:include, InstanceMethods)
     base.class_eval do
       unloadable
-# run code for updating issue
+      # run code for updating issue
       alias_method_chain :update, :write_due_date
        # for the watchers adding by mail
       alias_method_chain :create, :watchers_adding

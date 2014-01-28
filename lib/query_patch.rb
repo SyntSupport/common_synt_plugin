@@ -6,6 +6,7 @@ module QueryPatch
   module InstanceMethods
     def self.included(receiver)
       receiver.class_eval do
+        # not to allow a customer to filter tasks by workers names
         def available_filters
           unless @available_filters
             initialize_available_filters

@@ -101,6 +101,7 @@ module UserPatch
   module InstanceMethods
     def self.included(base)
       base.class_eval do
+        # to hide real names from a customer
         def name(formatter = nil)
           if !User.current.client? || self.client?
             f = self.class.name_formatter(formatter)
@@ -121,6 +122,7 @@ module UserPatch
           return @isclient
         end
 
+        # not to show a "second name" of a additional watcher
         def to_s
           name.slice!(" not_user")
           name

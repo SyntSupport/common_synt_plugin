@@ -14,6 +14,7 @@ module WatchersHelperPatch
   module InstanceMethods
     def self.included(receiver)
       receiver.class_eval do
+        # not to show workers as watchers for a customer
         def watchers_list(object)
           remove_allowed = User.current.allowed_to?("delete_#{object.class.name.underscore}_watchers".to_sym, object.project)
           content = ''.html_safe

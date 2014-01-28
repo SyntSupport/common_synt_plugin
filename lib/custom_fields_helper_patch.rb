@@ -6,6 +6,7 @@ module CustomFieldsHelperPatch
   module InstanceMethods
     def self.included(receiver)
       receiver.class_eval do
+        # For the transformation of a options as string to a options as a list
         def custom_field_tag(name, custom_value)
           custom_field = custom_value.custom_field
           field_name = "#{name}[custom_field_values][#{custom_field.id}]"
@@ -14,6 +15,7 @@ module CustomFieldsHelperPatch
 
           tag_options = {:id => field_id, :class => "#{custom_field.field_format}_cf"}
 
+          # the only change in this method
           if (custom_field.id == 9)
             cust_field = CustomValue.find(:first, :conditions => "customized_id = #{@project.id} and custom_field_id = '10'")
             if !cust_field.nil?      
