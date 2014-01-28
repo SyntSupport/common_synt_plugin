@@ -1,44 +1,47 @@
-module RefinedWatchersList
-  module Patches
-    module WatchersHelperPatch
-      def self.included(base)
-        #base.extend(ClassMethods)
-        base.send(:include, InstanceMethods)
-        base.class_eval do
-          unloadable
+module WatchersHelperPatch
+  def self.included(base)
+    #base.extend(ClassMethods)
+    base.send(:include, InstanceMethods)
+    base.class_eval do
+      unloadable
+    end
+  end
 
-          # run code for updating issue
-          alias_method_chain :watchers_list, :filter
-        end
-      end
+  module ClassMethods
 
-      module ClassMethods
+  end
 
-      end
-
-      module InstanceMethods
-        def watchers_list_with_filter(object)
-          lis = watchers_list_without_filter(object)
-          lis_filt = ""
-          unless lis == ""
-            watchers_arr = lis.split("\n")
-            watchers_arr.each do |watcher|
-              if /Syntellect/.match watcher
-                if /<ul>/.match watcher
-                  lis_filt << "<ul>"
-                elsif /<\/ul>/.match watcher
-                  lis_filt << "</ul>"
-                end
-              else
-                watcher.slice!(" not_user")
-                lis_filt << watcher << "\n"
-              end
+  module InstanceMethods
+    def self.included(receiver)
+      receiver.class_eval do
+        def watchers_list(object)
+          remove_allowed = User.current.allowed_to?("delete_#{object.class.name.underscore}_watchers".to_sym, object.project)
+          content = ''.html_safe
+          lis = object.watcher_users.collect do |user|
+            if user.name == "Syntellect"
+              next
             end
+            user.name.slice!(" not_user")
+            s = ''.html_safe
+            s << avatar(user, :size => "16").to_s
+            s << link_to_user(user, :class => 'user')
+            if remove_allowed
+              url = {:controller => 'watchers',
+                     :action => 'destroy',
+                     :object_type => object.class.to_s.underscore,
+                     :object_id => object.id,
+                     :user_id => user}
+              s << ' '
+              s << link_to(image_tag('delete.png'), url,
+                           :remote => true, :method => 'delete', :class => "delete")
+            end
+            content << content_tag('li', s, :class => "user-#{user.id}")
           end
-          return lis_filt
+          content.present? ? content_tag('ul', content, :class => 'watchers') : content
         end
       end
     end
   end
 end
+
 

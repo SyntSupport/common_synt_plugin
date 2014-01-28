@@ -2,8 +2,8 @@
 
 <h3><%=@report_title%></h3>
 <% if User.current.allowed_to?(:view_members, @project, :global => true) || !(@field == "assigned_to_id" || @field == "author_id")%>
-  <%= render :partial => 'details', :locals => { :data => @data, :field_name => @field, :rows => @rows } %>
-<%  end %>
+	<%= render :partial => 'details', :locals => { :data => @data, :field_name => @field, :rows => @rows } %>
+<% end %>
 <br />
-<%= link_to l(:button_back), :action => 'issue_report' %>
+<%= link_to l(:button_back), project_issues_report_path(@project) %>
 

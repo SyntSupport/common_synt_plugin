@@ -1,30 +1,35 @@
-require 'redmine'
-require 'date'
-require 'active_support'
+# require 'redmine'
+# require 'date'
+# require 'active_support'
 
-require File.dirname(__FILE__) + '/lib/user_patch.rb'
-require File.dirname(__FILE__) + '/lib/issues_controller_patch.rb'
-require File.dirname(__FILE__) + '/lib/project_patch.rb'
-require File.dirname(__FILE__) + '/lib/watchers_helper_patch.rb'
-require File.dirname(__FILE__) + '/lib/watchers_controller_patch.rb'
+# require File.dirname(__FILE__) + '/lib/issues_controller_patch.rb'
+# require File.dirname(__FILE__) + '/lib/project_patch.rb'
 
-require 'dispatcher'
-Dispatcher.to_prepare :common_synt_plugin do
-  require_dependency 'project'
-  Project.send(:include, RefinedWatchersList::Patches::ProjectPatch)
-  require_dependency 'watchers_helper'
-  WatchersHelper.send(:include, RefinedWatchersList::Patches::WatchersHelperPatch)
+#   require_dependency 'project'
+#   Project.send(:include, RefinedWatchersList::Patches::ProjectPatch)
+   require_dependency 'watchers_helper'
+   WatchersHelper.send(:include, WatchersHelperPatch)
 
-  #require_dependency 'project'
-  require_dependency 'user'
-  User.send(:include, StrongPasswordCheck::Patches::UserPatch)
+   require_dependency 'user'
+   User.send(:include, UserPatch)
 
-  require_dependency 'issues_controller'
-  IssuesController.send(:include, MandatoryFieldsAndStatusAutochange::Patches::IssuesControllerPatch)
+   require_dependency 'users_controller'
+   UsersController.send(:include, UsersControllerPatch)
 
-  require_dependency 'watchers_controller'
-  WatchersController.send(:include, RefinedWatchersList::Patches::WatchersControllerPatch)
-end
+   require_dependency 'custom_fields_helper'
+   CustomFieldsHelper.send(:include, CustomFieldsHelperPatch)
+
+   require_dependency 'mailer'
+   Mailer.send(:include, MailerPatch)
+
+   require_dependency 'query'
+   Query.send(:include, QueryPatch)
+
+   require_dependency 'issues_controller'
+   IssuesController.send(:include, IssuesControllerPatch)
+
+   require_dependency 'watchers_controller'
+   WatchersController.send(:include, WatchersControllerPatch)
 
 Redmine::Plugin.register :common_synt_plugin do
   name 'Common synt plugin'
@@ -43,5 +48,9 @@ Redmine::Plugin.register :common_synt_plugin do
   permission :edit_estimated_hours, :issues => :index
 
   permission :edit_start_date, :issues => :index
+
+  permission :view_members, :issues => :index
+  permission :see_real_names, :issues => :index
+  permission :edit_custom_fields, :issues => :index
 end
 
