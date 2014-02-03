@@ -16,8 +16,7 @@ module UsersControllerPatch
 
           unless User.current.admin?
             if !@user.active? || (@user != User.current  && @memberships.empty? && events.empty?) ||
-                 (!User.current.allowed_to?(:see_real_names, @memberships, :global => true) &&
-                   @user.allowed_to?(:see_real_names, @memberships, :global => true))
+                 (User.current.client? && ! @user.client?)
               render_404
               return
             end
