@@ -14,7 +14,10 @@ module MailerPatch
           journal.each_notification(to + cc) do |users|
             issue.each_notification(users) do |users2|
               [users2.select{|x| !x.client? }].collect do |workers|
+                curr_user = User.current
+                User.current= workers.first
                 Mailer.issue_edit(journal, workers, []).deliver
+                User.current= curr_user
               end
               [users2.select{|x| x.client? }].collect do |clients|
                 curr_user = User.current
@@ -32,7 +35,10 @@ module MailerPatch
           cc = issue.notified_watchers - to
           issue.each_notification(to + cc) do |users|
             [users.select{|x| !x.client? }].collect do |workers|
+              curr_user = User.current
+              User.current= workers.first
               Mailer.issue_add(issue, workers, []).deliver
+              User.current= curr_user
             end
             [users.select{|x| x.client? }].collect do |clients|
               curr_user = User.current
