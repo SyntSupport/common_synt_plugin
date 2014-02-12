@@ -3,7 +3,7 @@ ru:
   field_custom_2: "Результат"
   field_custom_9: "Категория"
   field_custom_5: "Форма оказания услуги"
-
+  blank_field: "не может быть пустым"
   label_history_tab_all: Все
   label_history_tab_comments: Комментарии
 

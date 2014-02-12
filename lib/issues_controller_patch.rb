@@ -77,13 +77,13 @@ module IssuesControllerPatch
                 end
             when 5 #закрыто
                if (params[:issue][:custom_field_values]["2"] == "")
-                 @issue.errors.add( :custom_2, :blank)
+                 @issue.errors[:base] << "#{l(:field_custom_2)} #{l(:blank_field)}"
                end
                if (params[:issue][:custom_field_values]["9"] == "")
-                 @issue.errors.add( :custom_9, :blank)
+                 @issue.errors[:base] << "#{l(:field_custom_9)} #{l(:blank_field)}"
                end
                if (params[:issue][:custom_field_values]["5"] == "")
-                 @issue.errors.add( :custom_5, :blank)
+                 @issue.errors[:base] << "#{l(:field_custom_5)} #{l(:blank_field)}"
                end
                if (params[:issue][:estimated_hours] == "")
                  @issue.errors.add( :estimated_hours, :blank)
