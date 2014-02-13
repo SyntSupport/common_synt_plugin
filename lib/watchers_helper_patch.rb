@@ -40,6 +40,16 @@ module WatchersHelperPatch
           end
           content.present? ? content_tag('ul', content, :class => 'watchers') : content
         end
+
+	def watchers_checkboxes(object, users, checked=nil)
+	    users.map do |user|
+	      c = checked.nil? ? object.watched_by?(user) || (user.client? if user.respond_to?('client?')) : checked
+	      tag = check_box_tag 'issue[watcher_user_ids][]', user.id, c, :id => nil
+	      content_tag 'label', "#{tag} #{h(user)}".html_safe,
+			  :id => "issue_watcher_user_ids_#{user.id}",
+			  :class => "floating"
+	    end.join.html_safe
+	end
       end
     end
   end
