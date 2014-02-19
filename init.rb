@@ -5,8 +5,9 @@
 # require File.dirname(__FILE__) + '/lib/issues_controller_patch.rb'
 # require File.dirname(__FILE__) + '/lib/project_patch.rb'
 
-#   require_dependency 'project'
-#   Project.send(:include, RefinedWatchersList::Patches::ProjectPatch)
+   require_dependency 'project'
+   Project.send(:include, ProjectPatch)
+
    require_dependency 'watchers_helper'
    WatchersHelper.send(:include, WatchersHelperPatch)
 
